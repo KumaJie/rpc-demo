@@ -1,0 +1,26 @@
+syntax = "proto3";
+option go_package = "rpc-douyin/src/proto/auth";
+package proto.auth;
+
+message AuthGenRequest {
+  int64 user_id = 1;
+}
+message AuthGenResponse {
+  int64 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+  string token = 3;
+}
+
+message AuthRequest {
+  string token = 1;
+}
+
+message AuthResponse {
+  int64 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+}
+
+service AuthService {
+  rpc AuthGen(AuthGenRequest) returns(AuthGenResponse);
+  rpc Authenticate(AuthRequest) returns(AuthResponse);
+}
