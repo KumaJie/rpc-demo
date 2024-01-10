@@ -1,0 +1,15 @@
+syntax = "proto3";
+option go_package = "rpc-douyin/src/proto/user";
+package proto.user;
+
+message UserRequest {
+  int64 user_id = 1;
+}
+
+message UserResponse {
+  int64 status_code = 1;
+}
+
+service UserService {
+  rpc GetUserExist(UserRequest) returns(UserResponse);
+}

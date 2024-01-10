@@ -1,0 +1,15 @@
+syntax = "proto3";
+package proto.video;
+option go_package = "rpc-douyin/src/proto/video";
+
+message UserRequest {
+  int64 user_id = 1;
+}
+
+message UserResponse {
+  int64 status_code = 1;
+}
+
+service UserService {
+  rpc GetUserExist(UserRequest) returns(UserResponse);
+}
