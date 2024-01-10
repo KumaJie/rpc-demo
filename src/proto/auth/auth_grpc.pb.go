@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -28,7 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthServiceClient interface {
 	AuthGen(ctx context.Context, in *AuthGenRequest, opts ...grpc.CallOption) (*AuthGenResponse, error)
-	Authenticate(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*AuthResponse, error)
+	Authenticate(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type authServiceClient struct {
@@ -48,8 +49,8 @@ func (c *authServiceClient) AuthGen(ctx context.Context, in *AuthGenRequest, opt
 	return out, nil
 }
 
-func (c *authServiceClient) Authenticate(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*AuthResponse, error) {
-	out := new(AuthResponse)
+func (c *authServiceClient) Authenticate(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, AuthService_Authenticate_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -62,7 +63,7 @@ func (c *authServiceClient) Authenticate(ctx context.Context, in *AuthRequest, o
 // for forward compatibility
 type AuthServiceServer interface {
 	AuthGen(context.Context, *AuthGenRequest) (*AuthGenResponse, error)
-	Authenticate(context.Context, *AuthRequest) (*AuthResponse, error)
+	Authenticate(context.Context, *AuthRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -73,7 +74,7 @@ type UnimplementedAuthServiceServer struct {
 func (UnimplementedAuthServiceServer) AuthGen(context.Context, *AuthGenRequest) (*AuthGenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AuthGen not implemented")
 }
-func (UnimplementedAuthServiceServer) Authenticate(context.Context, *AuthRequest) (*AuthResponse, error) {
+func (UnimplementedAuthServiceServer) Authenticate(context.Context, *AuthRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Authenticate not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}

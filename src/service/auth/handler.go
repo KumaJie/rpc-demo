@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/http"
+	"github.com/golang/protobuf/ptypes/empty"
 	"rpc-douyin/src/proto/auth"
 	"rpc-douyin/src/util"
 )
@@ -16,22 +16,17 @@ func (a AuthServiceImpl) AuthGen(ctx context.Context, request *auth.AuthGenReque
 	userID := request.GetUserId()
 	token, err := util.GenerateToken(userID)
 	return &auth.AuthGenResponse{
-		StatusCode: http.StatusOK,
-		StatusMsg:  "",
-		Token:      token,
+		Token: token,
 	}, err
 
 }
 
-func (a AuthServiceImpl) Authenticate(ctx context.Context, request *auth.AuthRequest) (*auth.AuthResponse, error) {
+func (a AuthServiceImpl) Authenticate(ctx context.Context, request *auth.AuthRequest) (*empty.Empty, error) {
 	//TODO implement me
 	token := request.GetToken()
 	claim, err := util.VerifyToken(token)
 	fmt.Println(claim.UserId)
-	return &auth.AuthResponse{
-		StatusCode: http.StatusOK,
-		StatusMsg:  "",
-	}, err
+	return &empty.Empty{}, err
 }
 
 func (a AuthServiceImpl) mustEmbedUnimplementedAuthServiceServer() {}

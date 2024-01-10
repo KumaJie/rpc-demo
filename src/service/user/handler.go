@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"net/http"
 	"rpc-douyin/src/model"
 	"rpc-douyin/src/proto/user"
 	"rpc-douyin/src/storage/db"
@@ -18,8 +17,6 @@ func (u UserServiceImpl) GetUserInfo(ctx context.Context, request *user.UserInfo
 	var res model.User
 	err := db.DBClient.Where("user_id = ?", userID).First(&res).Error
 	return &user.UserInfoResponse{
-		StatusCode: http.StatusOK,
-		StatusMsg:  "",
 		User: &user.User{
 			Id:       res.ID,
 			Name:     res.Name,
@@ -33,9 +30,7 @@ func (u UserServiceImpl) UserLogin(ctx context.Context, request *user.UserLoginR
 	var loginUser model.User
 	err := db.DBClient.Where("username = ? and password = ?", request.GetUsername(), request.GetPassword()).First(&loginUser).Error
 	return &user.UserLoginResponse{
-		StatusCode: http.StatusOK,
-		StatusMsg:  "",
-		UserId:     loginUser.ID,
+		UserId: loginUser.ID,
 	}, err
 }
 
@@ -47,9 +42,7 @@ func (u UserServiceImpl) UserRegister(ctx context.Context, request *user.UserReg
 	}
 	err := db.DBClient.Create(&registerUser).Error
 	return &user.UserRegisterResponse{
-		StatusCode: http.StatusOK,
-		StatusMsg:  "",
-		UserId:     registerUser.ID,
+		UserId: registerUser.ID,
 	}, err
 }
 
