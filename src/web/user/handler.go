@@ -4,18 +4,21 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"rpc-douyin/src/config"
+	"rpc-douyin/src/model"
 	"rpc-douyin/src/proto/auth"
 	"rpc-douyin/src/proto/user"
 	"rpc-douyin/src/util/connectWrapper"
+	"strconv"
 )
 
 var userClient user.UserServiceClient
 var authClient auth.AuthServiceClient
 
 func init() {
-	userConn := connectWrapper.Connect(8000)
+	userConn := connectWrapper.Connect(config.Cfg.Server.User.Name)
 	userClient = user.NewUserServiceClient(userConn)
-	authConn := connectWrapper.Connect(8001)
+	authConn := connectWrapper.Connect(config.Cfg.Server.Auth.Name)
 	authClient = auth.NewAuthServiceClient(authConn)
 }
 
@@ -35,11 +38,67 @@ func LoginHandler(c *gin.Context) {
 
 	}
 	token := res.GetToken()
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"status_code": 0,
-		"status_msg":  "登陆成功",
-		"user_id":     userID,
-		"token":       token,
+	c.JSON(http.StatusOK, model.UserResponse{
+		Response: model.Response{
+			StatusCode: 0,
+			StatusMsg:  "登录成功",
+		},
+		UserID: userID,
+		Token:  token,
 	})
+}
 
+func RegisterHandler(c *gin.Context) {
+	username := c.Query("username")
+	password := c.Query("password")
+	ret, err := userClient.UserRegister(context.Background(), &user.UserRegisterRequest{
+		Username: username,
+		Password: password,
+	})
+	if err != nil {
+		return
+	}
+	userID := ret.GetUserId()
+	res, err := authClient.AuthGen(context.Background(), &auth.AuthGenRequest{UserId: userID})
+	if err != nil {
+		return
+	}
+	token := res.GetToken()
+	c.JSON(http.StatusOK, model.UserResponse{
+		Response: model.Response{
+			StatusCode: 0,
+			StatusMsg:  "注册成功",
+		},
+		UserID: userID,
+		Token:  token,
+	})
+}
+
+func UserInfoHandler(c *gin.Context) {
+	userIDStr := c.Query("user_id")
+	userID, _ := strconv.ParseInt(userIDStr, 10, 64)
+	ret, err := userClient.GetUserInfo(context.Background(), &user.UserInfoRequest{UserId: userID})
+	if err != nil {
+		return
+	}
+	u := ret.GetUser()
+	c.JSON(http.StatusOK, model.UserInfoResponse{
+		Response: model.Response{
+			StatusCode: 0,
+			StatusMsg:  "",
+		},
+		User: model.UserInfo{
+			ID:              u.GetId(),
+			Name:            u.GetName(),
+			FollowCount:     u.GetFollowCount(),
+			FollowerCount:   u.GetFollowerCount(),
+			IsFollow:        false,
+			Avatar:          u.GetAvatar(),
+			BackgroundImage: u.GetBackgroundImage(),
+			Signature:       u.GetSignature(),
+			TotalFavorited:  u.GetTotalFavorited(),
+			WorkCount:       u.GetWorkCount(),
+			FavoriteCount:   u.GetFavoriteCount(),
+		},
+	})
 }

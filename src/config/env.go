@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"github.com/spf13/viper"
+	"path"
+	"runtime"
 )
 
 var Cfg *Config
@@ -32,10 +34,11 @@ type Config struct {
 }
 
 func init() {
-	//viper.AddConfigPath("src/config")
-	//viper.SetConfigName("config")
-	//viper.SetConfigType("yml")
-	viper.SetConfigFile("C:\\Users\\67561\\GolandProjects\\rpc-douyin\\src\\config\\config.yml")
+	_, filename, _, _ := runtime.Caller(0)
+	configDir := path.Dir(filename)
+	viper.AddConfigPath(configDir)
+	viper.SetConfigName("config")
+	viper.SetConfigType("yml")
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic(err)
