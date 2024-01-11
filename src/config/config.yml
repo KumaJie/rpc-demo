@@ -1,0 +1,16 @@
+database:
+  name: "douyin"
+  user: "root"
+  password: "123456"
+  host: "127.0.0.1"
+  port: 3306
+etcd:
+  host: "127.0.0.1"
+  port: 2379
+server:
+  user:
+    name: "UserService"
+    port: 8000
+  auth:
+    name: "AuthService"
+    port: 8001
