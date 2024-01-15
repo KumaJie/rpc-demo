@@ -14,3 +14,8 @@ server:
   auth:
     name: "AuthService"
     port: 8001
+  video:
+    name: "VideoService"
+    port: 8002
+file:
+  dir: "C:/Users/67561/GolandProjects/rpc-douyin/feed"

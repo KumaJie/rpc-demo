@@ -30,7 +30,14 @@ type Config struct {
 			Name string `yaml:"name"`
 			Port int    `yaml:"port"`
 		} `yaml:"auth"`
+		Video struct {
+			Name string `yaml:"name"`
+			Port int    `yaml:"port"`
+		} `yaml:"video"`
 	} `yaml:"server"`
+	File struct {
+		Dir string `yaml:"dir"`
+	} `yaml:"file"`
 }
 
 func init() {

@@ -16,10 +16,19 @@ func init() {
 }
 
 func AuthMiddleware(c *gin.Context) {
-	token := c.Query("token")
-	_, err := authClient.Authenticate(context.Background(), &auth.AuthRequest{Token: token})
+	var token string
+	if c.Request.URL.Path == "/douyin/publish/action/" {
+		token = c.PostForm("token")
+	} else {
+		token = c.Query("token")
+
+	}
+	authResp, err := authClient.Authenticate(context.Background(), &auth.AuthRequest{Token: token})
 	if err != nil {
 		return
+	}
+	if _, ok := c.Get("user_id"); !ok {
+		c.Set("user_id", authResp.UserId)
 	}
 	c.Next()
 }
