@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 	"path"
 	"runtime"
@@ -37,6 +36,7 @@ type Config struct {
 	} `yaml:"server"`
 	File struct {
 		Dir string `yaml:"dir"`
+		Max int    `yaml:"max"`
 	} `yaml:"file"`
 }
 
@@ -54,5 +54,4 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(Cfg)
 }

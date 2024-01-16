@@ -2,6 +2,7 @@ package video
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"mime/multipart"
 	"net/http"
@@ -40,7 +41,7 @@ func VideoPublishHandler(c *gin.Context) {
 		Title:  title,
 	})
 	if err != nil {
-
+		fmt.Println(err)
 	}
 	c.JSON(http.StatusOK, &model.Response{
 		StatusCode: 0,
@@ -64,15 +65,16 @@ func PublishListHandler(c *gin.Context) {
 }
 
 func FeedHandler(c *gin.Context) {
-	feedResp, _ := videoClient.Feed(context.Background(), &video.FeedRequest{LatestTime: nil})
-	feed := make([]*video.Video, 0)
-	feed = append(feed, feedResp.VideoList)
+	// 首次请求会发起两次，第一次是latest_time = now()，第二次是latest_time = next_time(第一次请求返回的结果，即最早的发布时间)
+	latestTimeStr := c.Query("latest_time")
+	latestTime, _ := strconv.ParseInt(latestTimeStr, 10, 64)
+	feedResp, _ := videoClient.Feed(context.Background(), &video.FeedRequest{LatestTime: &latestTime})
 	c.JSON(http.StatusOK, model.FeedResp{
 		Response: model.Response{
 			StatusCode: 0,
 			StatusMsg:  "",
 		},
-		VideoList: feed,
-		NextTime:  0,
+		VideoList: feedResp.GetVideoList(),
+		NextTime:  feedResp.GetNextTime(),
 	})
 }

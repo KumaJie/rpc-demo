@@ -19,3 +19,4 @@ server:
     port: 8002
 file:
   dir: "C:/Users/67561/GolandProjects/rpc-douyin/feed"
+  max: 10485760

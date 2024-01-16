@@ -22,7 +22,10 @@ func (a AuthServiceImpl) AuthGen(ctx context.Context, request *auth.AuthGenReque
 func (a AuthServiceImpl) Authenticate(ctx context.Context, request *auth.AuthRequest) (*auth.AuthResponse, error) {
 	token := request.GetToken()
 	claim, err := util.VerifyToken(token)
-	return &auth.AuthResponse{UserId: claim.UserId}, err
+	if err != nil {
+		return &auth.AuthResponse{}, err
+	}
+	return &auth.AuthResponse{UserId: claim.UserId}, nil
 }
 
 func (a AuthServiceImpl) mustEmbedUnimplementedAuthServiceServer() {}

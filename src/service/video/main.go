@@ -14,7 +14,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	s := grpc.NewServer()
+	// 默认的接收数据大小约为4MB
+	s := grpc.NewServer(grpc.MaxRecvMsgSize(config.Cfg.File.Max))
 	video.RegisterVideoServiceServer(s, &VideoServiceImpl{})
 
 	service, err := etcd.NewNamingService()

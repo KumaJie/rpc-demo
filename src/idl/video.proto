@@ -24,7 +24,7 @@ message FeedRequest {
 }
 
 message FeedResponse {
-  Video video_list = 1;  // 视频列表
+  repeated Video video_list = 1;  // 视频列表
   optional int64 next_time = 2; // 本次返回的视频中，发布最早的时间，作为下次请求时的latest_time
 }
 
