@@ -81,24 +81,11 @@ func UserInfoHandler(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	u := ret.GetUser()
 	c.JSON(http.StatusOK, model.UserInfoResponse{
 		Response: model.Response{
 			StatusCode: 0,
 			StatusMsg:  "",
 		},
-		User: model.UserInfo{
-			ID:              u.GetId(),
-			Name:            u.GetName(),
-			FollowCount:     u.GetFollowCount(),
-			FollowerCount:   u.GetFollowerCount(),
-			IsFollow:        false,
-			Avatar:          u.GetAvatar(),
-			BackgroundImage: u.GetBackgroundImage(),
-			Signature:       u.GetSignature(),
-			TotalFavorited:  u.GetTotalFavorited(),
-			WorkCount:       u.GetWorkCount(),
-			FavoriteCount:   u.GetFavoriteCount(),
-		},
+		User: *ret.GetUser(),
 	})
 }
