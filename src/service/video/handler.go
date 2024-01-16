@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"os"
 	"os/exec"
@@ -14,6 +14,7 @@ import (
 	"rpc-douyin/src/storage/db"
 	"rpc-douyin/src/util/connectWrapper"
 	"rpc-douyin/src/util/fileWrapper"
+	"rpc-douyin/src/util/log"
 	"time"
 )
 
@@ -32,9 +33,10 @@ func (v VideoServiceImpl) VideoPublish(ctx context.Context, request *video.Publi
 	filePath := path.Join(config.Cfg.File.Dir, request.GetTitle()) + ".mp4"
 	err := os.WriteFile(filePath, request.GetData(), 755)
 	if err != nil {
+		log.Error("VideoService: save file failed", zap.String("file", filePath))
 		return &emptypb.Empty{}, err
 	}
-
+	log.Info("VideoService: save file succeed", zap.String("file", filePath))
 	go func() {
 		coverPath := path.Join(config.Cfg.File.Dir, request.GetTitle()) + ".jpg"
 		cmd := exec.Command("ffmpeg",
@@ -45,8 +47,10 @@ func (v VideoServiceImpl) VideoPublish(ctx context.Context, request *video.Publi
 			"-f", "image2",
 			coverPath)
 		if err := cmd.Run(); err != nil {
-			fmt.Println(err)
+			log.Error("VideoService: generate cover failed", zap.String("cover", coverPath))
+			return
 		}
+		log.Info("VideoService: generate cover succeed", zap.String("cover", coverPath))
 	}()
 
 	videoInfo := model.Video{
@@ -65,15 +69,17 @@ func (v VideoServiceImpl) GetPublistList(ctx context.Context, request *video.Pub
 	rawVideoList := make([]model.Video, 0)
 	dbRet := db.DBClient.Where("user_id = ?", userID).Find(&rawVideoList)
 	if dbRet.Error != nil {
+		log.Error("VideoService: get VideoList with user_id failed in db", zap.Int64("user_id", userID))
 		return &video.PublishListResponse{}, dbRet.Error
 	}
-
+	log.Info("VideoService: get VideoList succeed", zap.Int64("user_id", userID), zap.Int64("num", dbRet.RowsAffected))
 	videoList := make([]*video.Video, 0)
+	userInfoResp, err := userClient.GetUserInfo(context.Background(), &user.UserInfoRequest{UserId: userID})
+	if err != nil {
+		log.Error("VideoService: get userinfo failed", zap.Int64("user_id", userID))
+		return &video.PublishListResponse{}, err
+	}
 	for _, videoIter := range rawVideoList {
-		userInfoResp, err := userClient.GetUserInfo(context.Background(), &user.UserInfoRequest{UserId: videoIter.UserID})
-		if err != nil {
-			return &video.PublishListResponse{}, err
-		}
 		videoList = append(videoList, &video.Video{
 			Id:            videoIter.ID,
 			Author:        userInfoResp.GetUser(),
@@ -92,12 +98,15 @@ func (v VideoServiceImpl) Feed(ctx context.Context, request *video.FeedRequest) 
 	rawVideos := make([]model.Video, 0)
 	dbRet := db.DBClient.Order("create_time desc").Where("create_time < ?", time.UnixMilli(request.GetLatestTime())).Limit(3).Find(&rawVideos)
 	if dbRet.Error != nil {
+		log.Error("VideoService: get feed failed in db ")
 		return &video.FeedResponse{}, dbRet.Error
 	}
+	log.Info("VideoService: get feed succeed", zap.Int64("latest_time", request.GetLatestTime()), zap.Int64("num", dbRet.RowsAffected))
 	feedVideos := make([]*video.Video, 0)
 	for _, rawVideo := range rawVideos {
 		userInfoResp, err := userClient.GetUserInfo(context.Background(), &user.UserInfoRequest{UserId: rawVideo.UserID})
 		if err != nil {
+			log.Error("VideoService: get userinfo failed", zap.Int64("user_id", rawVideo.UserID))
 			return &video.FeedResponse{}, err
 		}
 		feedVideos = append(feedVideos, &video.Video{

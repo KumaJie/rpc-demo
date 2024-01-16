@@ -5,7 +5,9 @@ import (
 	"fmt"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/naming/endpoints"
+	"go.uber.org/zap"
 	"rpc-douyin/src/config"
+	"rpc-douyin/src/util/log"
 )
 
 const (
@@ -59,10 +61,10 @@ func (n *NamingService) Register(e *Endpoint) error {
 	ch, err := n.Client.KeepAlive(context.Background(), lease.ID)
 	go func() {
 		for {
-			ka := <-ch
-			fmt.Println(ka.ID, ka.TTL)
+			<-ch
 		}
 	}()
+	log.Info("etcd: register naming service", zap.String("name", fmt.Sprintf("%s/%s/%d", nameServicePrefix, e.Name, lease.ID)))
 	return err
 }
 
