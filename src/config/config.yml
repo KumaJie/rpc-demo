@@ -17,6 +17,12 @@ server:
   video:
     name: "VideoService"
     port: 8002
+  favorite:
+    name: "favoriteService"
+    port: 8003
+  comment:
+    name: "commentService"
+    port: 8004
 file:
   dir: "C:/Users/67561/GolandProjects/rpc-douyin/feed"
   max: 10485760

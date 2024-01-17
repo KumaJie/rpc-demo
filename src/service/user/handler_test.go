@@ -16,7 +16,7 @@ func TestUserServiceImpl_GetUserInfo(t *testing.T) {
 	conn := connectWrapper.Connect(userServiceName)
 	defer conn.Close()
 	client := user.NewUserServiceClient(conn)
-	ret, err := client.GetUserInfo(context.Background(), &user.UserInfoRequest{UserId: 10})
+	ret, err := client.GetUserInfo(context.Background(), &user.UserInfoRequest{UserId: 1})
 	assert.NoError(t, err)
 	fmt.Println(ret)
 }

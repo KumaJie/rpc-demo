@@ -21,8 +21,11 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	VideoService_VideoPublish_FullMethodName   = "/proto.video.VideoService/VideoPublish"
-	VideoService_GetPublistList_FullMethodName = "/proto.video.VideoService/GetPublistList"
+	VideoService_GetPublishList_FullMethodName = "/proto.video.VideoService/GetPublishList"
+	VideoService_GetPublishId_FullMethodName   = "/proto.video.VideoService/GetPublishId"
+	VideoService_PublishCount_FullMethodName   = "/proto.video.VideoService/PublishCount"
 	VideoService_Feed_FullMethodName           = "/proto.video.VideoService/Feed"
+	VideoService_GetVideo_FullMethodName       = "/proto.video.VideoService/GetVideo"
 )
 
 // VideoServiceClient is the client API for VideoService service.
@@ -30,8 +33,11 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type VideoServiceClient interface {
 	VideoPublish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	GetPublistList(ctx context.Context, in *PublishListRequest, opts ...grpc.CallOption) (*PublishListResponse, error)
+	GetPublishList(ctx context.Context, in *PublishListRequest, opts ...grpc.CallOption) (*PublishListResponse, error)
+	GetPublishId(ctx context.Context, in *PublishListRequest, opts ...grpc.CallOption) (*PublishIdListResponse, error)
+	PublishCount(ctx context.Context, in *PublishCountRequest, opts ...grpc.CallOption) (*PublishCountResponse, error)
 	Feed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*FeedResponse, error)
+	GetVideo(ctx context.Context, in *GetVideoRequest, opts ...grpc.CallOption) (*GetVideoResponse, error)
 }
 
 type videoServiceClient struct {
@@ -51,9 +57,27 @@ func (c *videoServiceClient) VideoPublish(ctx context.Context, in *PublishReques
 	return out, nil
 }
 
-func (c *videoServiceClient) GetPublistList(ctx context.Context, in *PublishListRequest, opts ...grpc.CallOption) (*PublishListResponse, error) {
+func (c *videoServiceClient) GetPublishList(ctx context.Context, in *PublishListRequest, opts ...grpc.CallOption) (*PublishListResponse, error) {
 	out := new(PublishListResponse)
-	err := c.cc.Invoke(ctx, VideoService_GetPublistList_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, VideoService_GetPublishList_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *videoServiceClient) GetPublishId(ctx context.Context, in *PublishListRequest, opts ...grpc.CallOption) (*PublishIdListResponse, error) {
+	out := new(PublishIdListResponse)
+	err := c.cc.Invoke(ctx, VideoService_GetPublishId_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *videoServiceClient) PublishCount(ctx context.Context, in *PublishCountRequest, opts ...grpc.CallOption) (*PublishCountResponse, error) {
+	out := new(PublishCountResponse)
+	err := c.cc.Invoke(ctx, VideoService_PublishCount_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -69,13 +93,25 @@ func (c *videoServiceClient) Feed(ctx context.Context, in *FeedRequest, opts ...
 	return out, nil
 }
 
+func (c *videoServiceClient) GetVideo(ctx context.Context, in *GetVideoRequest, opts ...grpc.CallOption) (*GetVideoResponse, error) {
+	out := new(GetVideoResponse)
+	err := c.cc.Invoke(ctx, VideoService_GetVideo_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VideoServiceServer is the server API for VideoService service.
 // All implementations must embed UnimplementedVideoServiceServer
 // for forward compatibility
 type VideoServiceServer interface {
 	VideoPublish(context.Context, *PublishRequest) (*emptypb.Empty, error)
-	GetPublistList(context.Context, *PublishListRequest) (*PublishListResponse, error)
+	GetPublishList(context.Context, *PublishListRequest) (*PublishListResponse, error)
+	GetPublishId(context.Context, *PublishListRequest) (*PublishIdListResponse, error)
+	PublishCount(context.Context, *PublishCountRequest) (*PublishCountResponse, error)
 	Feed(context.Context, *FeedRequest) (*FeedResponse, error)
+	GetVideo(context.Context, *GetVideoRequest) (*GetVideoResponse, error)
 	mustEmbedUnimplementedVideoServiceServer()
 }
 
@@ -86,11 +122,20 @@ type UnimplementedVideoServiceServer struct {
 func (UnimplementedVideoServiceServer) VideoPublish(context.Context, *PublishRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VideoPublish not implemented")
 }
-func (UnimplementedVideoServiceServer) GetPublistList(context.Context, *PublishListRequest) (*PublishListResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetPublistList not implemented")
+func (UnimplementedVideoServiceServer) GetPublishList(context.Context, *PublishListRequest) (*PublishListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPublishList not implemented")
+}
+func (UnimplementedVideoServiceServer) GetPublishId(context.Context, *PublishListRequest) (*PublishIdListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPublishId not implemented")
+}
+func (UnimplementedVideoServiceServer) PublishCount(context.Context, *PublishCountRequest) (*PublishCountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PublishCount not implemented")
 }
 func (UnimplementedVideoServiceServer) Feed(context.Context, *FeedRequest) (*FeedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Feed not implemented")
+}
+func (UnimplementedVideoServiceServer) GetVideo(context.Context, *GetVideoRequest) (*GetVideoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVideo not implemented")
 }
 func (UnimplementedVideoServiceServer) mustEmbedUnimplementedVideoServiceServer() {}
 
@@ -123,20 +168,56 @@ func _VideoService_VideoPublish_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _VideoService_GetPublistList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _VideoService_GetPublishList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PublishListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(VideoServiceServer).GetPublistList(ctx, in)
+		return srv.(VideoServiceServer).GetPublishList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: VideoService_GetPublistList_FullMethodName,
+		FullMethod: VideoService_GetPublishList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(VideoServiceServer).GetPublistList(ctx, req.(*PublishListRequest))
+		return srv.(VideoServiceServer).GetPublishList(ctx, req.(*PublishListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VideoService_GetPublishId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PublishListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).GetPublishId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VideoService_GetPublishId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).GetPublishId(ctx, req.(*PublishListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VideoService_PublishCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PublishCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).PublishCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VideoService_PublishCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).PublishCount(ctx, req.(*PublishCountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -159,6 +240,24 @@ func _VideoService_Feed_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VideoService_GetVideo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetVideoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).GetVideo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VideoService_GetVideo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).GetVideo(ctx, req.(*GetVideoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VideoService_ServiceDesc is the grpc.ServiceDesc for VideoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -171,12 +270,24 @@ var VideoService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _VideoService_VideoPublish_Handler,
 		},
 		{
-			MethodName: "GetPublistList",
-			Handler:    _VideoService_GetPublistList_Handler,
+			MethodName: "GetPublishList",
+			Handler:    _VideoService_GetPublishList_Handler,
+		},
+		{
+			MethodName: "GetPublishId",
+			Handler:    _VideoService_GetPublishId_Handler,
+		},
+		{
+			MethodName: "PublishCount",
+			Handler:    _VideoService_PublishCount_Handler,
 		},
 		{
 			MethodName: "Feed",
 			Handler:    _VideoService_Feed_Handler,
+		},
+		{
+			MethodName: "GetVideo",
+			Handler:    _VideoService_GetVideo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

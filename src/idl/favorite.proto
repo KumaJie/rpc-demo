@@ -1,0 +1,50 @@
+syntax = "proto3";
+package proto.favorite;
+option go_package = "rpc-douyin/src/proto/favorite";
+
+import "video.proto";
+import "google/protobuf/empty.proto";
+
+message FavoriteActionRequest {
+  int64 user_id = 1;
+  int64 video_id = 2;
+  int64 action_type = 3; // 1-点赞，2-取消点赞
+}
+
+message FavoriteListRequest {
+  int64 user_id = 1;
+}
+
+message FavoriteListResponse {
+  repeated video.Video video_list = 1;
+}
+
+message UserFavoriteCountRequest {
+  int64 user_id = 1;
+}
+
+message VideoFavoriteCountRequest {
+  int64 video_id = 1;
+}
+
+message FavoriteCountResponse {
+  int64 favorite_count = 1;
+}
+
+message IsFavoriteRequest {
+  int64 user_id = 1;
+  int64 video_id = 2;
+}
+
+message IsFavoriteResponse {
+  bool favorite = 1;
+}
+
+service FavoriteService {
+  rpc FavoriteAction(FavoriteActionRequest) returns (google.protobuf.Empty);
+  rpc FavoriteList(FavoriteListRequest) returns (FavoriteListResponse);
+  rpc UserFavoriteCount(UserFavoriteCountRequest) returns (FavoriteCountResponse);  // 用户点赞数量
+  rpc UserTotalFavorite(UserFavoriteCountRequest) returns (FavoriteCountResponse);  //  用户获赞数量
+  rpc VideoFavoriteCount(VideoFavoriteCountRequest) returns (FavoriteCountResponse);  //  视频获赞数量
+  rpc IsFavorite(IsFavoriteRequest) returns (IsFavoriteResponse);
+}

@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"net"
 	"rpc-douyin/src/config"
 	"rpc-douyin/src/proto/user"
 	"rpc-douyin/src/storage/etcd"
+	"rpc-douyin/src/util/log"
 )
 
 func main() {
@@ -38,4 +40,5 @@ func main() {
 		service.Delete(e)
 		return
 	}
+	log.Info("UserService: service start", zap.Int("port", config.Cfg.Server.User.Port))
 }

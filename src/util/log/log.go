@@ -14,7 +14,9 @@ func init() {
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	encoder := zapcore.NewJSONEncoder(encoderConfig)
-	core := zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), zapcore.DebugLevel)
+	file, _ := os.OpenFile("C:\\Users\\67561\\GolandProjects\\rpc-douyin\\build\\test.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 644)
+	fileWriteSyncer := zapcore.AddSync(file)
+	core := zapcore.NewCore(encoder, fileWriteSyncer, zapcore.DebugLevel)
 	logger = zap.New(core)
 }
 
