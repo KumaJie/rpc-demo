@@ -26,5 +26,5 @@ type VideoResp struct {
 type FeedResp struct {
 	Response
 	VideoList []*video.Video `json:"video_list"`
-	NextTime  int64          `json:"next_time"`
+	NextTime  *int64         `json:"next_time,omitempty"`
 }

@@ -186,11 +186,13 @@ func (v VideoServiceImpl) Feed(ctx context.Context, request *video.FeedRequest) 
 			Title:         rawVideo.Title,
 		})
 	}
-	var nextTime int64 = 0
-	if len(rawVideos) > 0 {
-		// 返回的这一批视频中，发布最早的时间
-		nextTime = rawVideos[len(rawVideos)-1].CreateTime.UnixMilli()
+	if len(rawVideos) == 0 {
+		return &video.FeedResponse{}, nil
 	}
+	// 返回的这一批视频中，发布最早的时间
+	var nextTime int64
+	nextTime = rawVideos[len(rawVideos)-1].CreateTime.UnixMilli()
+
 	return &video.FeedResponse{
 		VideoList: feedVideos,
 		NextTime:  &nextTime,

@@ -28,7 +28,7 @@ func TestVideoServiceImpl_Feed(t *testing.T) {
 			ret, err := client.Feed(context.Background(), &video.FeedRequest{LatestTime: &latestTime})
 			assert.NoError(t, err)
 			if len(ret.GetVideoList()) == 0 {
-				assert.Zero(t, ret.GetNextTime())
+				assert.Nil(t, ret.NextTime)
 				break
 			}
 			latestTime = ret.GetNextTime()

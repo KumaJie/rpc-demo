@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"rpc-douyin/src/proto/comment"
+	"time"
+)
 
 type Comment struct {
 	ID         int64     `gorm:"column:comment_id"`
@@ -12,4 +15,14 @@ type Comment struct {
 
 func (Comment) TableName() string {
 	return "comment"
+}
+
+type CommentActionResp struct {
+	Response
+	Comment *comment.Comment `json:"comment"`
+}
+
+type CommentListResp struct {
+	Response
+	CommentList []*comment.Comment `json:"comment_list"`
 }

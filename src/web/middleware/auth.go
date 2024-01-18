@@ -27,8 +27,7 @@ func AuthMiddleware(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	if _, ok := c.Get("user_id"); !ok {
-		c.Set("user_id", authResp.UserId)
-	}
+	c.Set("user_id", authResp.UserId)
+
 	c.Next()
 }

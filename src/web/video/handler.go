@@ -11,6 +11,7 @@ import (
 	"rpc-douyin/src/proto/video"
 	"rpc-douyin/src/util/connectWrapper"
 	"strconv"
+	"time"
 )
 
 var videoClient video.VideoServiceClient
@@ -53,7 +54,7 @@ func PublishListHandler(c *gin.Context) {
 	userIDStr := c.Query("user_id")
 	userID, _ := strconv.ParseInt(userIDStr, 10, 64)
 
-	ret, _ := videoClient.GetPublistList(context.Background(), &video.PublishListRequest{UserId: userID})
+	ret, _ := videoClient.GetPublishList(context.Background(), &video.PublishListRequest{UserId: userID})
 	videoList := ret.GetVideoList()
 	c.JSON(http.StatusOK, model.VideoResp{
 		Response: model.Response{
@@ -68,6 +69,7 @@ func FeedHandler(c *gin.Context) {
 	// 首次请求会发起两次，第一次是latest_time = now()，第二次是latest_time = next_time(第一次请求返回的结果，即最早的发布时间)
 	latestTimeStr := c.Query("latest_time")
 	latestTime, _ := strconv.ParseInt(latestTimeStr, 10, 64)
+	fmt.Println(time.UnixMilli(latestTime))
 	feedResp, _ := videoClient.Feed(context.Background(), &video.FeedRequest{LatestTime: &latestTime})
 	c.JSON(http.StatusOK, model.FeedResp{
 		Response: model.Response{
@@ -75,6 +77,6 @@ func FeedHandler(c *gin.Context) {
 			StatusMsg:  "",
 		},
 		VideoList: feedResp.GetVideoList(),
-		NextTime:  feedResp.GetNextTime(),
+		NextTime:  feedResp.NextTime,
 	})
 }
