@@ -5,7 +5,6 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"os"
-	"os/exec"
 	"path"
 	"rpc-douyin/src/config"
 	"rpc-douyin/src/model"
@@ -45,22 +44,6 @@ func (v VideoServiceImpl) VideoPublish(ctx context.Context, request *video.Publi
 		return &emptypb.Empty{}, err
 	}
 	log.Info("VideoService: save file succeed", zap.String("file", filePath))
-	go func() {
-		coverPath := path.Join(config.Cfg.File.Dir, request.GetTitle()) + ".jpg"
-		cmd := exec.Command("ffmpeg",
-			"-i", filePath,
-			"-vframes", "1",
-			"-update", "true",
-			"-y",
-			"-f", "image2",
-			coverPath)
-		if err := cmd.Run(); err != nil {
-			log.Error("VideoService: generate cover failed", zap.String("cover", coverPath))
-			return
-		}
-		log.Info("VideoService: generate cover succeed", zap.String("cover", coverPath))
-	}()
-
 	videoInfo := model.Video{
 		UserID:     request.GetUserId(),
 		PlayURL:    request.GetTitle() + ".mp4",
@@ -69,6 +52,9 @@ func (v VideoServiceImpl) VideoPublish(ctx context.Context, request *video.Publi
 		CreateTime: time.Now(),
 	}
 	err = db.DBClient.Create(&videoInfo).Error
+	//producer, _ := mq.NewSyncProducer()
+	//msg, _ := mq.NewMessage("publish", request.GetTitle())
+	//producer.SendMessage(msg)
 	return &emptypb.Empty{}, err
 }
 

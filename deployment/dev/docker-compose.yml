@@ -1,0 +1,19 @@
+version: "3"
+services:
+  etcd:
+    container_name: "EtcdService"
+    image: quay.io/coreos/etcd:v3.5.5
+    ports:
+      - "2379:2379"
+      - "2380:2380"
+    command: etcd -listen-peer-urls=http://127.0.0.1:2380 -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 -initial-advertise-peer-urls=http://127.0.0.1:2380 --initial-cluster default=http://127.0.0.1:2380 --data-dir /etcd
+  mysql:
+    container_name: "MySqlService"
+    image: mysql:8.0.34
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    volumes:
+      - C:\Env\mysql\data:/var/lib/mysql
+      - C:\Env\mysql\log:/var/log/mysql

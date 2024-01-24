@@ -26,16 +26,45 @@ func main() {
 	}
 	e := etcd.Endpoint{
 		Name: config.Cfg.Server.Video.Name,
-		Addr: "127.0.0.1",
+		Addr: config.Cfg.Server.Video.Host,
 		Port: config.Cfg.Server.Video.Port,
 	}
 	err = service.Register(&e)
 	if err != nil {
 		panic(err)
 	}
+	log.Info("VideoService: service start", zap.Int("port", config.Cfg.Server.Video.Port))
+
+	//consumer, _ := mq.NewConsumer()
+	//topic := "publish"
+	//partitions, _ := consumer.Partitions(topic)
+	//for _, partition := range partitions {
+	//	cp, _ := consumer.ConsumePartition(topic, partition, sarama.OffsetNewest)
+	//	go CoverHandler(cp.Messages())
+	//}
+
 	err = s.Serve(lis)
 	if err != nil {
 		panic(err)
 	}
-	log.Info("VideoService: service start", zap.Int("port", config.Cfg.Server.Video.Port))
 }
+
+//func CoverHandler(messages <-chan *sarama.ConsumerMessage) {
+//	for msg := range messages {
+//		title := string(msg.Value)
+//		log.Info("VideoService: start generate cover", zap.String("title", title))
+//		coverPath := path.Join(config.Cfg.File.Dir, title) + ".jpg"
+//		cmd := exec.Command("ffmpeg",
+//			"-i", path.Join(config.Cfg.File.Dir, title)+".mp4",
+//			"-vframes", "1",
+//			"-update", "true",
+//			"-y",
+//			"-f", "image2",
+//			coverPath)
+//		if err := cmd.Run(); err != nil {
+//			log.Error("VideoService: generate cover failed", zap.String("cover", coverPath), zap.Error(err))
+//			return
+//		}
+//		log.Info("VideoService: generate cover succeed", zap.String("cover", coverPath))
+//	}
+//}

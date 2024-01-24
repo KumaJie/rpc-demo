@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 	"rpc-douyin/src/config"
 	"rpc-douyin/src/util/log"
+	"time"
 )
 
 const (
@@ -28,7 +29,10 @@ type Endpoint struct {
 
 func NewNamingService() (*NamingService, error) {
 	etcdURL := fmt.Sprintf("http://%s:%d", config.Cfg.Etcd.Host, config.Cfg.Etcd.Port)
-	client, err := clientv3.NewFromURL(etcdURL)
+	client, _ := clientv3.NewFromURL(etcdURL)
+	timeoutCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	_, err := client.Status(timeoutCtx, etcdURL)
 	if err != nil {
 		return nil, err
 	}

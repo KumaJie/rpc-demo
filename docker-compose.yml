@@ -1,0 +1,63 @@
+version: "3"
+services:
+  auth:
+    container_name: "AuthService"
+    image: rpc:1.0
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    command:
+      - ./build/auth
+  comment:
+    container_name: "CommentService"
+    image: rpc:1.0
+    ports:
+      - "8004:8004"
+    env_file:
+      - .env
+    command:
+      - ./build/comment
+  favorite:
+    container_name: "FavoriteService"
+    image: rpc:1.0
+    ports:
+      - "8003:8003"
+    env_file:
+      - .env
+    command:
+      - ./build/favorite
+  user:
+    container_name: "UserService"
+    image: rpc:1.0
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    command:
+      - ./build/user
+  video:
+    container_name: "VideoService"
+    image: rpc:1.0
+    ports:
+      - "8002:8002"
+    env_file:
+      - .env
+    command:
+      - ./build/video
+  web:
+    container_name: "WebService"
+    image: rpc:1.0
+    depends_on:
+      - auth
+      - comment
+      - favorite
+      - user
+      - video
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    tty: true
+    command:
+      - ./build/web

@@ -26,7 +26,7 @@ func main() {
 
 	e := etcd.Endpoint{
 		Name: config.Cfg.Server.Comment.Name,
-		Addr: "127.0.0.1",
+		Addr: config.Cfg.Server.Comment.Host,
 		Port: config.Cfg.Server.Comment.Port,
 	}
 	err = service.Register(&e)

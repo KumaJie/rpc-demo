@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"rpc-douyin/src/config"
@@ -79,6 +80,7 @@ func UserInfoHandler(c *gin.Context) {
 	userID, _ := strconv.ParseInt(userIDStr, 10, 64)
 	ret, err := userClient.GetUserInfo(context.Background(), &user.UserInfoRequest{UserId: userID})
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 	c.JSON(http.StatusOK, model.UserInfoResponse{

@@ -7,22 +7,32 @@ database:
 etcd:
   host: "127.0.0.1"
   port: 2379
+kafka:
+  host: "127.0.0.1"
+  port: 9092
 server:
+  host: "127.0.0.1"
+  port: 8080
   user:
     name: "UserService"
+    host: ""
     port: 8000
   auth:
     name: "AuthService"
+    host: ""
     port: 8001
   video:
     name: "VideoService"
+    host: ""
     port: 8002
   favorite:
     name: "favoriteService"
+    host: ""
     port: 8003
   comment:
     name: "commentService"
+    host: ""
     port: 8004
 file:
-  dir: "C:/Users/67561/GolandProjects/rpc-douyin/feed"
+  dir: "feed"
   max: 10485760

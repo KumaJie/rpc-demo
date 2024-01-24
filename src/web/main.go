@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"rpc-douyin/src/config"
 	"rpc-douyin/src/web/comment"
 	"rpc-douyin/src/web/favorite"
 	"rpc-douyin/src/web/middleware"
@@ -38,5 +40,5 @@ func main() {
 			commentGroup.GET("/list/", middleware.AuthMiddleware, comment.CommentListHandler)
 		}
 	}
-	r.Run()
+	r.Run(fmt.Sprintf(":%d", config.Cfg.Server.Port))
 }
