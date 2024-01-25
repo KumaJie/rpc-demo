@@ -33,7 +33,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 	err = s.Serve(lis)
 	if err != nil {
 		fmt.Printf("failed to server: %v", err)

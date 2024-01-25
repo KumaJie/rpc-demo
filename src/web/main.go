@@ -14,7 +14,7 @@ import (
 
 func main() {
 	r := gin.Default()
-	r.StaticFS("/feed", http.Dir("feed"))
+	r.StaticFS("/feed", http.Dir(config.Cfg.File.Dir))
 	group := r.Group("/douyin")
 	{
 		userGroup := group.Group("/user")

@@ -11,6 +11,8 @@ COPY go.sum .
 
 #RUN apt update \
 #    && apt -y install ffmpeg
+# 设置中文编码
+ENV LANG C.UTF-8
 
 RUN go mod download \
     && bash ./script/build_all.sh

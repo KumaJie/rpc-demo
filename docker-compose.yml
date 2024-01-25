@@ -4,7 +4,7 @@ services:
     container_name: "AuthService"
     image: rpc:1.0
     ports:
-      - "8001:8001"
+      - "${SERVER_AUTH_PORT}:${SERVER_AUTH_PORT}"
     env_file:
       - .env
     command:
@@ -13,7 +13,7 @@ services:
     container_name: "CommentService"
     image: rpc:1.0
     ports:
-      - "8004:8004"
+      - "${SERVER_COMMENT_PORT}:${SERVER_COMMENT_PORT}"
     env_file:
       - .env
     command:
@@ -22,7 +22,7 @@ services:
     container_name: "FavoriteService"
     image: rpc:1.0
     ports:
-      - "8003:8003"
+      - "${SERVER_FAVORITE_PORT}:${SERVER_FAVORITE_PORT}"
     env_file:
       - .env
     command:
@@ -31,7 +31,7 @@ services:
     container_name: "UserService"
     image: rpc:1.0
     ports:
-      - "8000:8000"
+      - "${SERVER_USER_PORT}:${SERVER_USER_PORT}"
     env_file:
       - .env
     command:
@@ -40,9 +40,11 @@ services:
     container_name: "VideoService"
     image: rpc:1.0
     ports:
-      - "8002:8002"
+      - "${SERVER_VIDEO_PORT}:${SERVER_VIDEO_PORT}"
     env_file:
       - .env
+    volumes:
+      - C:\Users\67561\GolandProjects\rpc-douyin\feed:/feed
     command:
       - ./build/video
   web:
@@ -55,9 +57,10 @@ services:
       - user
       - video
     ports:
-      - "8080:8080"
+      - "${SERVER_PORT}:${SERVER_PORT}"
     env_file:
       - .env
-    tty: true
+    volumes:
+      - C:\Users\67561\GolandProjects\rpc-douyin\feed:/feed
     command:
       - ./build/web
