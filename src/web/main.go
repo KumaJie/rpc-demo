@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"rpc-douyin/src/config"
+	"rpc-douyin/src/util/tracer"
 	"rpc-douyin/src/web/comment"
 	"rpc-douyin/src/web/favorite"
 	"rpc-douyin/src/web/middleware"
@@ -13,8 +14,10 @@ import (
 )
 
 func main() {
+	tracer.InitTracer("WebService", fmt.Sprintf("%s:%d", config.Cfg.Server.Host, config.Cfg.Server.Port))
 	r := gin.Default()
 	r.StaticFS("/feed", http.Dir(config.Cfg.File.Dir))
+	r.Use(middleware.TracerMiddleware())
 	group := r.Group("/douyin")
 	{
 		userGroup := group.Group("/user")

@@ -10,6 +10,8 @@ import (
 	"rpc-douyin/src/proto/auth"
 	"rpc-douyin/src/proto/user"
 	"rpc-douyin/src/util/connectWrapper"
+	"rpc-douyin/src/util/tracer"
+	"rpc-douyin/src/web/middleware"
 	"strconv"
 )
 
@@ -77,8 +79,14 @@ func RegisterHandler(c *gin.Context) {
 
 func UserInfoHandler(c *gin.Context) {
 	userIDStr := c.Query("user_id")
+	spanCtx, _ := c.Get(middleware.SpanCtx)
+	span, _ := tracer.NewSpanFromContext(spanCtx.(context.Context), "UserInfoHandler")
+	defer span.Finish()
+
+	ctx := tracer.InjectGRPC(span.Context())
+
 	userID, _ := strconv.ParseInt(userIDStr, 10, 64)
-	ret, err := userClient.GetUserInfo(context.Background(), &user.UserInfoRequest{UserId: userID})
+	ret, err := userClient.GetUserInfo(ctx, &user.UserInfoRequest{UserId: userID})
 	if err != nil {
 		fmt.Println(err)
 		return

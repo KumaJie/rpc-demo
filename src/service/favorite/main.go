@@ -9,9 +9,12 @@ import (
 	"rpc-douyin/src/proto/favorite"
 	"rpc-douyin/src/storage/etcd"
 	"rpc-douyin/src/util/log"
+	"rpc-douyin/src/util/tracer"
 )
 
 func main() {
+
+	tracer.InitTracer(config.Cfg.Server.Favorite.Name, fmt.Sprintf("%s:%d", config.Cfg.Server.Favorite.Host, config.Cfg.Server.Favorite.Port))
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.Cfg.Server.Favorite.Port))
 	if err != nil {
 		panic(err)

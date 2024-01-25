@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"os"
 	"path"
@@ -16,6 +17,7 @@ import (
 	"rpc-douyin/src/util/connectWrapper"
 	"rpc-douyin/src/util/fileWrapper"
 	"rpc-douyin/src/util/log"
+	"rpc-douyin/src/util/tracer"
 	"time"
 )
 
@@ -107,6 +109,12 @@ func (v VideoServiceImpl) GetPublishList(ctx context.Context, request *video.Pub
 }
 
 func (v VideoServiceImpl) GetPublishId(ctx context.Context, request *video.PublishListRequest) (*video.PublishIdListResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	parentSC, _ := tracer.ExtractGRPC(md)
+
+	span := tracer.NewSpanFromSpanCtx(*parentSC, "GetPublishId")
+	defer span.Finish()
+
 	userID := request.GetUserId()
 	rawVideoList := make([]model.Video, 0)
 	dbRet := db.DBClient.Where("user_id = ?", userID).Find(&rawVideoList)
@@ -186,6 +194,12 @@ func (v VideoServiceImpl) Feed(ctx context.Context, request *video.FeedRequest) 
 }
 
 func (v VideoServiceImpl) PublishCount(ctx context.Context, request *video.PublishCountRequest) (*video.PublishCountResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	parentSC, _ := tracer.ExtractGRPC(md)
+
+	span := tracer.NewSpanFromSpanCtx(*parentSC, "PublishCount")
+	defer span.Finish()
+
 	var count int64
 	dbRet := db.DBClient.Model(&model.Video{}).Where("user_id = ?", request.GetUserId()).Count(&count)
 	if dbRet.Error != nil {

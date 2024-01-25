@@ -9,10 +9,13 @@ import (
 	"rpc-douyin/src/proto/video"
 	"rpc-douyin/src/storage/etcd"
 	"rpc-douyin/src/util/log"
+	"rpc-douyin/src/util/tracer"
 )
 
 func main() {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.Cfg.Server.Video.Port))
+	cfg := config.Cfg.Server.Video
+	tracer.InitTracer(cfg.Name, fmt.Sprintf("%s:%d", cfg.Host, cfg.Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Port))
 	if err != nil {
 		panic(err)
 	}

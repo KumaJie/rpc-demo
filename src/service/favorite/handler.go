@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"rpc-douyin/src/config"
 	"rpc-douyin/src/model"
@@ -11,6 +12,7 @@ import (
 	"rpc-douyin/src/storage/db"
 	"rpc-douyin/src/util/connectWrapper"
 	"rpc-douyin/src/util/log"
+	"rpc-douyin/src/util/tracer"
 )
 
 var videoClient video.VideoServiceClient
@@ -66,6 +68,12 @@ func (f FavoriteServiceImpl) FavoriteList(ctx context.Context, request *favorite
 }
 
 func (f FavoriteServiceImpl) UserFavoriteCount(ctx context.Context, request *favorite.UserFavoriteCountRequest) (*favorite.FavoriteCountResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	parentSC, _ := tracer.ExtractGRPC(md)
+
+	span := tracer.NewSpanFromSpanCtx(*parentSC, "UserFavoriteCount")
+	defer span.Finish()
+
 	var count int64
 	dbRet := db.DBClient.Model(&model.Favorite{}).Where("user_id = ?", request.GetUserId()).Count(&count)
 	if dbRet.Error != nil {
@@ -76,7 +84,15 @@ func (f FavoriteServiceImpl) UserFavoriteCount(ctx context.Context, request *fav
 }
 
 func (f FavoriteServiceImpl) UserTotalFavorite(ctx context.Context, request *favorite.UserFavoriteCountRequest) (*favorite.FavoriteCountResponse, error) {
-	vcRet, err := videoClient.GetPublishId(ctx, &video.PublishListRequest{UserId: request.GetUserId()})
+	md, _ := metadata.FromIncomingContext(ctx)
+	parentSC, _ := tracer.ExtractGRPC(md)
+
+	span := tracer.NewSpanFromSpanCtx(*parentSC, "UserTotalFavorite")
+	defer span.Finish()
+
+	spanCtx := tracer.InjectGRPC(span.Context())
+
+	vcRet, err := videoClient.GetPublishId(spanCtx, &video.PublishListRequest{UserId: request.GetUserId()})
 	if err != nil {
 		return &favorite.FavoriteCountResponse{}, err
 	}

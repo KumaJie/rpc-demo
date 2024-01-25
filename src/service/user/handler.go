@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/metadata"
 	"rpc-douyin/src/config"
 	"rpc-douyin/src/model"
 	"rpc-douyin/src/proto/favorite"
@@ -11,6 +12,7 @@ import (
 	"rpc-douyin/src/storage/db"
 	"rpc-douyin/src/util/connectWrapper"
 	"rpc-douyin/src/util/log"
+	"rpc-douyin/src/util/tracer"
 	"sync"
 )
 
@@ -29,6 +31,14 @@ type UserServiceImpl struct {
 }
 
 func (u UserServiceImpl) GetUserInfo(ctx context.Context, request *user.UserInfoRequest) (*user.UserInfoResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	parentSC, _ := tracer.ExtractGRPC(md)
+
+	span := tracer.NewSpanFromSpanCtx(*parentSC, "GetUserInfo")
+	defer span.Finish()
+
+	spanCtx := tracer.InjectGRPC(span.Context())
+
 	userID := request.GetUserId()
 	var res model.User
 	err := db.DBClient.Where("user_id = ?", userID).First(&res).Error
@@ -43,19 +53,19 @@ func (u UserServiceImpl) GetUserInfo(ctx context.Context, request *user.UserInfo
 	var favoriteCount int64
 	go func() {
 		defer g.Done()
-		fcRet, _ := favoriteClient.UserFavoriteCount(ctx, &favorite.UserFavoriteCountRequest{UserId: userID})
+		fcRet, _ := favoriteClient.UserFavoriteCount(spanCtx, &favorite.UserFavoriteCountRequest{UserId: userID})
 		favoriteCount = fcRet.GetFavoriteCount()
 	}()
 
 	go func() {
 		defer g.Done()
-		fcRet, _ := favoriteClient.UserTotalFavorite(ctx, &favorite.UserFavoriteCountRequest{UserId: userID})
+		fcRet, _ := favoriteClient.UserTotalFavorite(spanCtx, &favorite.UserFavoriteCountRequest{UserId: userID})
 		totalFavorited = fcRet.GetFavoriteCount()
 	}()
 
 	go func() {
 		defer g.Done()
-		vcRet, _ := videoClient.PublishCount(ctx, &video.PublishCountRequest{UserId: userID})
+		vcRet, _ := videoClient.PublishCount(spanCtx, &video.PublishCountRequest{UserId: userID})
 		workCount = vcRet.Count
 	}()
 

@@ -1,17 +1,18 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"rpc-douyin/src/model"
-	"rpc-douyin/src/storage/db"
+	"github.com/openzipkin/zipkin-go/propagation/b3"
+	"google.golang.org/grpc/metadata"
+	"rpc-douyin/src/util/tracer"
 )
 
 func main() {
-	var count int64
-	ret := db.DBClient.Model(&model.User{}).Count(&count)
-	if ret.Error != nil {
-		fmt.Println(ret.Error)
-		return
-	}
-	fmt.Println(count)
+	tracer.InitTracer("aa", "127.0.0.1:20")
+	span, _ := tracer.NewSpanFromContext(context.Background(), "asd")
+	md := metadata.MD{}
+	i := b3.InjectGRPC(&md)
+	i(span.Context())
+	fmt.Println(md)
 }

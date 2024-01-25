@@ -15,23 +15,23 @@ server:
   port: 8080
   user:
     name: "UserService"
-    host: ""
+    host: "127.0.0.1"
     port: 8000
   auth:
     name: "AuthService"
-    host: ""
+    host: "127.0.0.1"
     port: 8001
   video:
     name: "VideoService"
-    host: ""
+    host: "127.0.0.1"
     port: 8002
   favorite:
     name: "favoriteService"
-    host: ""
+    host: "127.0.0.1"
     port: 8003
   comment:
     name: "commentService"
-    host: ""
+    host: "127.0.0.1"
     port: 8004
 file:
   dir: "feed"
